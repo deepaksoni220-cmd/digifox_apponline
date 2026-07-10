@@ -6,9 +6,11 @@ import { Plus, Search, MoreHorizontal, Mail, Briefcase, X, Key, Edit2 } from 'lu
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
+import { createAccount } from '@/app/actions/auth';
+
 const initialEmployees = [
-  { id: '1', name: 'Alex Rivera', role: 'Senior Developer', email: 'alex@digifox.world', status: 'Active', userId: 'emp_alex', password: 'password123' },
-  { id: '2', name: 'Samantha Lee', role: 'UI/UX Designer', email: 'sam@digifox.world', status: 'Active', userId: 'emp_sam', password: 'password123' },
+  { id: '1', name: 'Alex Rivera', role: 'Senior Developer', email: 'alex@digifox.world', status: 'Active', userId: 'emp_alex@digifox.world', password: 'password123' },
+  { id: '2', name: 'Samantha Lee', role: 'UI/UX Designer', email: 'sam@digifox.world', status: 'Active', userId: 'emp_sam@digifox.world', password: 'password123' },
 ];
 
 export default function EmployeesManagementPage() {
@@ -18,6 +20,8 @@ export default function EmployeesManagementPage() {
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   
   const [formData, setFormData] = useState({ id: '', name: '', role: '', email: '', userId: '', password: '' });
 
@@ -29,18 +33,36 @@ export default function EmployeesManagementPage() {
   const openAddModal = () => {
     setModalMode('add');
     setFormData({ id: '', name: '', role: '', email: '', userId: '', password: '' });
+    setErrorMsg('');
     setIsModalOpen(true);
   };
 
   const openEditModal = (emp: any) => {
     setModalMode('edit');
     setFormData(emp);
+    setErrorMsg('');
     setIsModalOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMsg('');
+
     if (modalMode === 'add') {
+      const authData = new FormData();
+      authData.append('email', formData.userId); // userId field is used for login email
+      authData.append('password', formData.password);
+      authData.append('role', 'employee'); // Set role to employee
+      
+      const result = await createAccount(authData);
+      
+      if (!result.success) {
+        setErrorMsg(result.error || 'Failed to create user');
+        setIsSubmitting(false);
+        return;
+      }
+
       setEmployees([...employees, {
         id: Math.random().toString(),
         name: formData.name,
@@ -53,6 +75,8 @@ export default function EmployeesManagementPage() {
     } else {
       setEmployees(employees.map(emp => emp.id === formData.id ? { ...emp, ...formData } : emp));
     }
+    
+    setIsSubmitting(false);
     setIsModalOpen(false);
   };
 
@@ -207,13 +231,26 @@ export default function EmployeesManagementPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 flex justify-end gap-3">
-                  <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">
-                    {modalMode === 'add' ? 'Save & Invite' : 'Update Credentials'}
-                  </Button>
+                <div className="pt-4 flex flex-col gap-3">
+                  {errorMsg && (
+                    <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900">
+                      {errorMsg}
+                    </div>
+                  )}
+                  <div className="flex justify-end gap-3">
+                    <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <span className="flex items-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Saving...
+                        </span>
+                      ) : (
+                        modalMode === 'add' ? 'Save & Invite' : 'Update Credentials'
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </form>
             </motion.div>
