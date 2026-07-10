@@ -16,7 +16,7 @@ export function MobileBottomNav({ role = 'guest' }: MobileBottomNavProps) {
   const items = NAV_ITEMS[role];
 
   return (
-    <div className="fixed bottom-6 left-4 right-4 z-50 md:hidden">
+    <div className="fixed left-4 right-4 z-50 md:hidden" style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className="absolute inset-0 rounded-3xl border border-white/40 bg-white/60 backdrop-blur-xl shadow-2xl shadow-indigo-900/10 dark:border-white/10 dark:bg-gray-950/60 dark:shadow-black/50" />
       <nav className="relative flex items-center justify-around px-2 py-2">
         {items.map((item) => {
