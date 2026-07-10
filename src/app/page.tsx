@@ -8,28 +8,48 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { SlideToLogin } from '@/components/ui/slide-to-login';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
     }
+    setErrorMsg(null);
     setLoading(true);
-    // Simulate login for now - route based on email just for demo
-    setTimeout(() => {
-      setLoading(false);
-      if (email.includes('admin')) {
-        window.location.href = '/admin';
-      } else if (email.includes('employee')) {
-        window.location.href = '/employee';
-      } else {
-        window.location.href = '/client';
+    
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
       }
-    }, 1000);
+
+      if (data?.user) {
+        const role = data.user.user_metadata?.role;
+        const loginId = email.toLowerCase();
+        
+        if (role === 'admin' || loginId.includes('admin')) {
+          window.location.href = '/admin';
+        } else if (role === 'employee' || loginId.includes('employee')) {
+          window.location.href = '/employee';
+        } else {
+          window.location.href = '/client';
+        }
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to authenticate');
+      setLoading(false);
+    }
   };
 
   return (
@@ -75,6 +95,13 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              
+              {errorMsg && (
+                <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900">
+                  {errorMsg}
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <input type="checkbox" className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:border-gray-700 dark:bg-gray-900 dark:ring-offset-gray-900" />

@@ -8,30 +8,47 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg(null);
     setIsLoading(true);
     
-    // Simulate network request
-    setTimeout(() => {
-      // In a real app, this would validate credentials and route based on role
-      // For this prototype, we'll assume it's a client logging in
-      const loginId = email.toLowerCase();
-      if (loginId.includes('admin')) {
-        router.push('/admin');
-      } else if (loginId.includes('employee') || loginId.includes('emp_') || loginId === 'alex@digifox.world' || loginId === 'sam@digifox.world') {
-        router.push('/employee');
-      } else {
-        router.push('/client');
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
       }
-    }, 800);
+
+      if (data?.user) {
+        const role = data.user.user_metadata?.role;
+        const loginId = email.toLowerCase();
+        
+        if (role === 'admin' || loginId.includes('admin')) {
+          router.push('/admin');
+        } else if (role === 'employee' || loginId.includes('employee') || loginId.includes('emp_')) {
+          router.push('/employee');
+        } else {
+          router.push('/client');
+        }
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to authenticate');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -88,6 +105,12 @@ export default function LoginPage() {
                 />
               </div>
             </div>
+
+            {errorMsg && (
+              <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900">
+                {errorMsg}
+              </div>
+            )}
 
             <Button 
               type="submit" 
