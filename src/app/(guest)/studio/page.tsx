@@ -46,6 +46,7 @@ const ServiceCard = ({
             thickness={0.005}
             speed={0.5}
             aspectRatio="auto"
+            scale={1}
             style={{ width: "100%", height: "100%", flex: 1, borderRadius: "1.5rem" }} 
           />
         </div>
