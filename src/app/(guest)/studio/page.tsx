@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { SERVICES } from '@/lib/constants';
 import * as Icons from 'lucide-react';
+import PulsingBorder from '@/components/ui/pulsing-border';
 
 export default function StudioPage() {
   return (
@@ -37,18 +38,27 @@ export default function StudioPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="relative p-8 rounded-3xl bg-white border border-gray-100 shadow-xl shadow-gray-200/20 dark:bg-gray-900/50 dark:border-gray-800 dark:shadow-none hover:-translate-y-1 transition-transform duration-300 group"
+              className="relative p-8 rounded-3xl bg-transparent border border-gray-200/50 dark:border-gray-800/50 shadow-xl overflow-hidden hover:-translate-y-1 transition-transform duration-300 group min-h-[250px] flex flex-col justify-center"
             >
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 -z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-500">
+                <PulsingBorder 
+                  colorBack="#0f172a" 
+                  colors={["#af40ff", "#5b42f3", "#00ddeb"]}
+                  roundness={0.2}
+                  thickness={0.02}
+                  speed={0.5}
+                  style={{ width: "100%", height: "100%", borderRadius: "1.5rem" }} 
+                />
+              </div>
               
-              <div className="relative z-10">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Icon className="h-7 w-7" />
+              <div className="relative z-10 flex flex-col items-center text-center mt-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md text-white mb-6 group-hover:scale-110 transition-transform duration-300 border border-white/20 shadow-lg">
+                  <Icon className="h-8 w-8 drop-shadow-md" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                <h3 className="text-2xl font-bold text-white mb-3 drop-shadow-md">
                   {service.name}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p className="text-gray-200 leading-relaxed drop-shadow-sm font-medium text-sm">
                   {service.description}
                 </p>
               </div>
