@@ -38,14 +38,15 @@ const ServiceCard = ({
         style={{ scale }}
         className="relative p-12 rounded-3xl bg-[#0f172a] border border-gray-200/50 dark:border-gray-800/50 shadow-2xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 group w-full max-w-4xl min-h-[400px] flex flex-col justify-center"
       >
-        <div className="absolute inset-0 -z-10 transition-opacity duration-500">
+        <div className="absolute inset-0 -z-10 transition-opacity duration-500 flex items-stretch justify-stretch">
           <PulsingBorder 
             colorBack="#0f172a" 
             colors={["#af40ff", "#5b42f3", "#00ddeb"]}
             roundness={0.2}
             thickness={0.02}
             speed={0.5}
-            style={{ width: "100%", height: "100%", borderRadius: "1.5rem" }} 
+            aspectRatio="auto"
+            style={{ width: "100%", height: "100%", flex: 1, borderRadius: "1.5rem" }} 
           />
         </div>
         
