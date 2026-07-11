@@ -120,16 +120,21 @@ const ProjectTimeline = () => {
                 </div>
 
                 {/* Content Box */}
-                <div className={`mt-8 w-full p-6 rounded-2xl border transition-all duration-300 text-center ${
-                  isCurrent ? 'border-indigo-500/50 bg-indigo-50/80 dark:bg-indigo-950/40 shadow-xl shadow-indigo-500/20 -translate-y-2' : 
-                  isCompleted ? 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 hover:shadow-lg' : 
-                  'border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-900/20 opacity-70 hover:opacity-100'
+                <div className={`mt-8 w-full p-6 rounded-2xl border transition-all duration-500 text-center relative overflow-hidden backdrop-blur-xl ${
+                  isCurrent ? 'border-indigo-400/50 bg-gradient-to-br from-indigo-500/10 to-cyan-400/10 shadow-[0_8px_30px_rgba(99,102,241,0.2)] -translate-y-2' : 
+                  isCompleted ? 'border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 shadow-lg shadow-indigo-500/5 hover:-translate-y-1' : 
+                  'border-gray-200/50 dark:border-gray-800/50 bg-white/40 dark:bg-gray-900/40 hover:bg-white/60 dark:hover:bg-gray-900/60 opacity-80 hover:opacity-100 hover:-translate-y-1'
                 }`}>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest mb-3 block ${
-                    isCurrent ? 'text-indigo-500' : isCompleted ? 'text-green-500' : 'text-gray-400'
-                  }`}>{step.status}</span>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{step.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                  {isCurrent && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-cyan-400/20 to-indigo-500/20 opacity-50 blur-xl animate-pulse"></div>
+                  )}
+                  <div className="relative z-10">
+                    <span className={`text-[10px] font-bold uppercase tracking-widest mb-3 block ${
+                      isCurrent ? 'text-indigo-600 dark:text-indigo-400 drop-shadow-sm' : isCompleted ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400'
+                    }`}>{step.status}</span>
+                    <h3 className={`text-xl font-bold mb-2 ${isCurrent ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500 dark:from-indigo-400 dark:to-cyan-300' : 'text-gray-900 dark:text-white'}`}>{step.title}</h3>
+                    <p className={`text-sm leading-relaxed ${isCurrent ? 'text-indigo-900/90 dark:text-indigo-100/90 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>{step.desc}</p>
+                  </div>
                 </div>
               </motion.div>
             )
