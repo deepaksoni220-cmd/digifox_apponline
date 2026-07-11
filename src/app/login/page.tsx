@@ -134,9 +134,18 @@ export default function LoginPage() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Not a client yet? <Link href="/contact" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Contact our sales team</Link>
             </p>
-            <Link href="/home" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              &larr; Continue as Guest
-            </Link>
+            <div className="flex justify-center mt-2 pb-2">
+              <button type="button" onClick={() => router.push('/home')} className="btn-starry">
+                <strong>GUEST LOGIN</strong>
+                <div id="container-stars">
+                  <div id="stars"></div>
+                </div>
+                <div id="glow">
+                  <div className="circle"></div>
+                  <div className="circle"></div>
+                </div>
+              </button>
+            </div>
           </div>
           
           <div className="mt-6 p-4 rounded-xl bg-indigo-50/50 border border-indigo-100/50 dark:bg-indigo-900/10 dark:border-indigo-800/30">
