@@ -20,22 +20,12 @@ const ServiceCard = ({
   // @ts-ignore
   const Icon = Icons[service.icon] || Icons.Code;
   
-  // Calculate when this specific card should start scaling down
-  // Range is from this card's "turn" to the end of the scroll
-  const range = [index * (1 / total), 1];
-  
-  // Target scale decreases more for earlier cards so they look deeper in the stack
-  const targetScale = 1 - ((total - index) * 0.05);
-  
-  const scale = useTransform(progress, range, [1, targetScale]);
-  
   // Dynamically calculate top so they stagger vertically like a stack of cards
   const topOffset = `calc(15vh + ${index * 30}px)`;
 
   return (
     <div className="h-[60vh] flex items-center justify-center sticky" style={{ top: topOffset }}>
       <motion.div
-        style={{ scale }}
         className="relative p-12 rounded-3xl shadow-2xl hover:-translate-y-2 transition-transform duration-300 group w-full max-w-4xl min-h-[400px] flex flex-col justify-center"
       >
         <div className="absolute inset-0 -z-10 transition-opacity duration-500 flex items-stretch justify-stretch">
