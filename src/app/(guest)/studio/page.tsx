@@ -36,9 +36,9 @@ const ServiceCard = ({
     <div className="h-[60vh] flex items-center justify-center sticky" style={{ top: topOffset }}>
       <motion.div
         style={{ scale }}
-        className="relative p-12 rounded-3xl bg-transparent border border-gray-200/50 dark:border-gray-800/50 shadow-2xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 group w-full max-w-4xl min-h-[400px] flex flex-col justify-center"
+        className="relative p-12 rounded-3xl bg-[#0f172a] border border-gray-200/50 dark:border-gray-800/50 shadow-2xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 group w-full max-w-4xl min-h-[400px] flex flex-col justify-center"
       >
-        <div className="absolute inset-0 -z-10 opacity-70 group-hover:opacity-100 transition-opacity duration-500">
+        <div className="absolute inset-0 -z-10 transition-opacity duration-500">
           <PulsingBorder 
             colorBack="#0f172a" 
             colors={["#af40ff", "#5b42f3", "#00ddeb"]}
