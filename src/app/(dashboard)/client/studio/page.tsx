@@ -104,6 +104,13 @@ const ProjectTimeline = () => {
                 className="relative snap-center shrink-0 w-[280px] sm:w-80 flex flex-col items-center justify-start z-10 group"
               >
                 
+                {/* Arrow to Next Step */}
+                {i < PROJECT_STEPS.length - 1 && (
+                  <div className="absolute top-4 -right-8 sm:-right-10 text-indigo-300 dark:text-indigo-600/50 z-0">
+                    <Icons.ArrowRight className="w-8 h-8" />
+                  </div>
+                )}
+
                 {/* Marker */}
                 <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-white dark:border-[#0f172a] transition-all duration-500 z-10 ${
                   isCurrent ? 'bg-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.6)] scale-110' : 
