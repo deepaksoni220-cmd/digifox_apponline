@@ -9,22 +9,42 @@ export default function ClientSupportPage() {
   const [supportState, setSupportState] = useState<'idle' | 'loading' | 'success'>('idle');
   const [reqState, setReqState] = useState<'idle' | 'loading' | 'success'>('idle');
 
-  const handleSupportSubmit = (e: React.FormEvent) => {
+  const handleSupportSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSupportState('loading');
+
+    const formData = new FormData(e.currentTarget);
+    const subject = formData.get('subject');
+    const category = formData.get('category');
+    const priority = formData.get('priority');
+    const message = formData.get('message');
+    
+    const text = `*New Support Ticket*\n\n*Subject:* ${subject}\n*Category:* ${category}\n*Priority:* ${priority}\n*Message:*\n${message}`;
+    window.open(`https://wa.me/918696755996?text=${encodeURIComponent(text)}`, '_blank');
+
     setTimeout(() => {
       setSupportState('success');
       setTimeout(() => setSupportState('idle'), 3000);
-    }, 1500);
+    }, 1000);
   };
 
-  const handleReqSubmit = (e: React.FormEvent) => {
+  const handleReqSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setReqState('loading');
+
+    const formData = new FormData(e.currentTarget);
+    const projectName = formData.get('projectName');
+    const projectType = formData.get('projectType');
+    const startBy = formData.get('startBy');
+    const requirements = formData.get('requirements');
+    
+    const text = `*New Project Requirements*\n\n*Project Name:* ${projectName}\n*Type:* ${projectType}\n*Start By:* ${startBy}\n*Requirements:*\n${requirements}`;
+    window.open(`https://wa.me/918696755996?text=${encodeURIComponent(text)}`, '_blank');
+
     setTimeout(() => {
       setReqState('success');
       setTimeout(() => setReqState('idle'), 3000);
-    }, 1500);
+    }, 1000);
   };
 
   const inputClasses = "w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 dark:border-gray-800 dark:bg-gray-900/50 dark:focus:border-indigo-400 dark:focus:bg-gray-950 transition-all";
@@ -72,13 +92,13 @@ export default function ClientSupportPage() {
           <form onSubmit={handleSupportSubmit} className="space-y-5 relative z-10">
             <div>
               <label className={labelClasses}>Subject / Issue</label>
-              <input required type="text" placeholder="E.g. Cannot access billing portal" className={inputClasses} />
+              <input name="subject" required type="text" placeholder="E.g. Cannot access billing portal" className={inputClasses} />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClasses}>Category</label>
-                <select className={inputClasses}>
+                <select name="category" className={inputClasses}>
                   <option>Technical Issue</option>
                   <option>Billing Question</option>
                   <option>General Inquiry</option>
@@ -87,7 +107,7 @@ export default function ClientSupportPage() {
               </div>
               <div>
                 <label className={labelClasses}>Priority</label>
-                <select className={inputClasses}>
+                <select name="priority" className={inputClasses}>
                   <option>Normal</option>
                   <option>High</option>
                   <option>Urgent</option>
@@ -97,7 +117,7 @@ export default function ClientSupportPage() {
 
             <div>
               <label className={labelClasses}>Detailed Message</label>
-              <textarea required rows={4} placeholder="Please describe how we can help you..." className={`${inputClasses} resize-none`}></textarea>
+              <textarea name="message" required rows={4} placeholder="Please describe how we can help you..." className={`${inputClasses} resize-none`}></textarea>
             </div>
 
             <Button 
@@ -141,13 +161,13 @@ export default function ClientSupportPage() {
           <form onSubmit={handleReqSubmit} className="space-y-5 relative z-10">
             <div>
               <label className={labelClasses}>Project Name / Title</label>
-              <input required type="text" placeholder="E.g. Q4 E-Commerce Redesign" className={inputClasses} />
+              <input name="projectName" required type="text" placeholder="E.g. Q4 E-Commerce Redesign" className={inputClasses} />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClasses}>Project Type</label>
-                <select className={inputClasses}>
+                <select name="projectType" className={inputClasses}>
                   <option>Website Design</option>
                   <option>Web Application</option>
                   <option>Branding & Identity</option>
@@ -157,7 +177,7 @@ export default function ClientSupportPage() {
               </div>
               <div>
                 <label className={labelClasses}>Start By</label>
-                <select className={inputClasses} required>
+                <select name="startBy" className={inputClasses} required>
                   <option value="">Select urgency...</option>
                   <option value="Immediately">Immediately</option>
                   <option value="Within 7 days">Within 7 days</option>
@@ -167,7 +187,7 @@ export default function ClientSupportPage() {
 
             <div>
               <label className={labelClasses}>Detailed Requirements</label>
-              <textarea required rows={4} placeholder="List out your core objectives, features required, target audience, and any reference materials..." className={`${inputClasses} resize-none`}></textarea>
+              <textarea name="requirements" required rows={4} placeholder="List out your core objectives, features required, target audience, and any reference materials..." className={`${inputClasses} resize-none`}></textarea>
             </div>
 
             <Button 

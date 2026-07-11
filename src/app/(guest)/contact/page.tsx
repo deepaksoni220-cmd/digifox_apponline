@@ -9,22 +9,41 @@ export default function ContactPage() {
   const [supportState, setSupportState] = useState<'idle' | 'loading' | 'success'>('idle');
   const [reqState, setReqState] = useState<'idle' | 'loading' | 'success'>('idle');
 
-  const handleSupportSubmit = (e: React.FormEvent) => {
+  const handleSupportSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSupportState('loading');
+
+    const formData = new FormData(e.currentTarget);
+    const userName = formData.get('userName');
+    const email = formData.get('email');
+    const message = formData.get('message');
+    
+    const text = `*New General Inquiry*\n\n*Name:* ${userName}\n*Email:* ${email}\n*Message:*\n${message}`;
+    window.open(`https://wa.me/918696755996?text=${encodeURIComponent(text)}`, '_blank');
+
     setTimeout(() => {
       setSupportState('success');
       setTimeout(() => setSupportState('idle'), 3000);
-    }, 1500);
+    }, 1000);
   };
 
-  const handleReqSubmit = (e: React.FormEvent) => {
+  const handleReqSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setReqState('loading');
+
+    const formData = new FormData(e.currentTarget);
+    const projectName = formData.get('projectName');
+    const projectType = formData.get('projectType');
+    const startBy = formData.get('startBy');
+    const requirements = formData.get('requirements');
+    
+    const text = `*New Project Requirements*\n\n*Project Name:* ${projectName}\n*Type:* ${projectType}\n*Start By:* ${startBy}\n*Requirements:*\n${requirements}`;
+    window.open(`https://wa.me/918696755996?text=${encodeURIComponent(text)}`, '_blank');
+
     setTimeout(() => {
       setReqState('success');
       setTimeout(() => setReqState('idle'), 3000);
-    }, 1500);
+    }, 1000);
   };
 
   const inputClasses = "w-full rounded-xl border border-gray-200 bg-white/50 px-4 py-3 text-sm focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 dark:border-gray-800 dark:bg-gray-900/50 dark:focus:border-indigo-400 dark:focus:bg-gray-950 transition-all backdrop-blur-sm";
@@ -86,17 +105,17 @@ export default function ContactPage() {
           <form onSubmit={handleSupportSubmit} className="space-y-5 relative z-10">
             <div>
               <label className={labelClasses}>Your Name</label>
-              <input required type="text" placeholder="John Doe" className={inputClasses} />
+              <input name="userName" required type="text" placeholder="John Doe" className={inputClasses} />
             </div>
 
             <div>
               <label className={labelClasses}>Email Address</label>
-              <input required type="email" placeholder="john@example.com" className={inputClasses} />
+              <input name="email" required type="email" placeholder="john@example.com" className={inputClasses} />
             </div>
 
             <div>
               <label className={labelClasses}>Message</label>
-              <textarea required rows={4} placeholder="How can we help you?" className={`${inputClasses} resize-none`}></textarea>
+              <textarea name="message" required rows={4} placeholder="How can we help you?" className={`${inputClasses} resize-none`}></textarea>
             </div>
 
             <Button 
@@ -140,13 +159,13 @@ export default function ContactPage() {
           <form onSubmit={handleReqSubmit} className="space-y-5 relative z-10">
             <div>
               <label className={labelClasses}>Project Name / Title</label>
-              <input required type="text" placeholder="E.g. E-Commerce Redesign" className={inputClasses} />
+              <input name="projectName" required type="text" placeholder="E.g. E-Commerce Redesign" className={inputClasses} />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClasses}>Project Type</label>
-                <select className={inputClasses}>
+                <select name="projectType" className={inputClasses}>
                   <option>Website Design</option>
                   <option>Web Application</option>
                   <option>Branding & Identity</option>
@@ -156,7 +175,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <label className={labelClasses}>Start By</label>
-                <select className={inputClasses} required>
+                <select name="startBy" className={inputClasses} required>
                   <option value="">Select urgency...</option>
                   <option value="Immediately">Immediately</option>
                   <option value="Within 7 days">Within 7 days</option>
@@ -166,7 +185,7 @@ export default function ContactPage() {
 
             <div>
               <label className={labelClasses}>Detailed Requirements</label>
-              <textarea required rows={4} placeholder="List out your objectives, features required, target audience, and any reference materials..." className={`${inputClasses} resize-none`}></textarea>
+              <textarea name="requirements" required rows={4} placeholder="List out your objectives, features required, target audience, and any reference materials..." className={`${inputClasses} resize-none`}></textarea>
             </div>
 
             <Button 
