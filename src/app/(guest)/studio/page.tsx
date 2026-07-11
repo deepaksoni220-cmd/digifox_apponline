@@ -61,7 +61,7 @@ const PROJECT_STEPS = [
   { title: "Onboarded", status: "completed", desc: "Initial requirements gathered.", icon: "CheckCircle" },
   { title: "Step 1", status: "current", desc: "Brand details submitted, UI UX design guide, build starting.", icon: "PenTool" },
   { title: "Step 2", status: "upcoming", desc: "Update as required.", icon: "Settings2" },
-  { title: "Done", status: "upcoming", desc: "Project finalized and launched.", icon: "Trophy" }
+  { title: "Done", status: "upcoming", desc: "Project done and launched online.", icon: "Trophy" }
 ];
 
 const ProjectTimeline = () => {
