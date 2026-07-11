@@ -60,8 +60,8 @@ const ServiceCard = ({
 const PROJECT_STEPS = [
   { title: "Onboarded", status: "completed", desc: "Initial requirements gathered.", icon: "CheckCircle" },
   { title: "Step 1", status: "current", desc: "Brand details submitted, UI UX design guide, build starting.", icon: "PenTool" },
-  { title: "Step 2", status: "upcoming", desc: "Update as required.", icon: "RefreshCw" },
-  { title: "Done", status: "upcoming", desc: "Project finalized and launched.", icon: "Flag" }
+  { title: "Step 2", status: "upcoming", desc: "Update as required.", icon: "Settings2" },
+  { title: "Done", status: "upcoming", desc: "Project finalized and launched.", icon: "Trophy" }
 ];
 
 const ProjectTimeline = () => {
@@ -114,9 +114,14 @@ const ProjectTimeline = () => {
                 {/* Marker */}
                 <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-white dark:border-[#0f172a] transition-all duration-500 z-10 ${
                   isCurrent ? 'bg-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.6)] scale-110' : 
+                  step.title === 'Done' ? 'bg-blue-100 dark:bg-blue-900/50 border-blue-500/30' :
                   isCompleted ? 'bg-indigo-400' : 'bg-gray-100 dark:bg-gray-800'
                 }`}>
-                  {isCompleted ? <Icons.Check className="w-7 h-7 text-white" /> : <Icon className={`w-6 h-6 ${isCurrent ? 'text-white animate-pulse' : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300'}`} />}
+                  {isCompleted ? <Icons.Check className="w-7 h-7 text-white" /> : <Icon className={`w-6 h-6 ${
+                    isCurrent ? 'text-white animate-pulse' : 
+                    step.title === 'Done' ? 'text-blue-500 animate-bounce drop-shadow-md' :
+                    'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+                  }`} />}
                 </div>
 
                 {/* Content Box */}
