@@ -149,12 +149,7 @@ export default function LoginPage() {
             </div>
           </div>
           
-          <div className="mt-6 p-4 rounded-xl bg-indigo-50/50 border border-indigo-100/50 dark:bg-indigo-900/10 dark:border-indigo-800/30">
-            <p className="text-xs text-indigo-600/80 dark:text-indigo-400/80 text-center leading-relaxed font-medium">
-              Prototype Note: Since there is no live database, routing is based on your email. 
-              Use <span className="font-bold">admin@</span> for Admin Dashboard, <span className="font-bold">employee@</span> for Employee Dashboard, and anything else for Client Dashboard.
-            </p>
-          </div>
+
         </motion.div>
       </main>
     </div>

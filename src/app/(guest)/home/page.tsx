@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Sparkles, Zap, Code, Shield } from 'lucide-react';
+import { ArrowRight, Zap, Code, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function HomePage() {
@@ -14,15 +14,7 @@ export default function HomePage() {
         <div className="absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-indigo-500/20 blur-[100px] dark:bg-indigo-500/10" />
         
         <div className="container relative mx-auto px-4 text-center sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mx-auto flex max-w-fit items-center gap-2 rounded-full border border-gray-200 bg-white/50 px-4 py-1.5 text-sm font-medium text-gray-600 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-300 mb-8"
-          >
-            <Sparkles className="h-4 w-4 text-indigo-500" />
-            <span>Digital Agency Management Platform</span>
-          </motion.div>
+
           
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
