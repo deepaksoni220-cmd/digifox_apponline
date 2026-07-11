@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import Link from 'next/link';
+import { SlideToLogin } from '@/components/ui/slide-to-login';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -131,12 +132,21 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 text-center flex flex-col gap-3">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
               Not a client yet? <Link href="/contact" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Contact our sales team</Link>
             </p>
-            <Link href="/home" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              &larr; Continue as Guest
-            </Link>
+            <div className="px-4 pb-2">
+              <SlideToLogin 
+                text="Slide for Guest Access"
+                loadingText="Entering Guest Mode..."
+                variant="starry"
+                onSuccess={() => {
+                  setTimeout(() => {
+                    router.push('/home');
+                  }, 500);
+                }}
+              />
+            </div>
           </div>
           
           <div className="mt-6 p-4 rounded-xl bg-indigo-50/50 border border-indigo-100/50 dark:bg-indigo-900/10 dark:border-indigo-800/30">

@@ -9,13 +9,15 @@ interface SlideToLoginProps {
   loading?: boolean;
   text?: string;
   loadingText?: string;
+  variant?: 'default' | 'starry';
 }
 
 export function SlideToLogin({ 
   onSuccess, 
   loading = false,
   text = 'Slide to Login',
-  loadingText = 'Authenticating...'
+  loadingText = 'Authenticating...',
+  variant = 'default'
 }: SlideToLoginProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,24 +72,50 @@ export function SlideToLogin({
     }
   }, [loading, isSuccess, controls]);
 
+  const isStarry = variant === 'starry';
+
   return (
     <div 
       ref={containerRef}
-      className="relative flex h-14 w-full items-center rounded-2xl bg-gray-100 p-1 overflow-hidden dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50"
+      className={`relative flex h-14 w-full items-center rounded-full p-1 overflow-hidden transition-transform duration-300 ${
+        isStarry 
+          ? 'slide-starry' 
+          : 'bg-gray-100 dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50'
+      }`}
     >
+      {isStarry && (
+        <>
+          <div id="container-stars">
+            <div id="stars"></div>
+          </div>
+          <div id="glow">
+            <div className="circle"></div>
+            <div className="circle"></div>
+          </div>
+        </>
+      )}
+
       {/* Background fill on drag */}
-      <motion.div 
-        className="absolute inset-0 bg-indigo-600 dark:bg-indigo-500 origin-left"
-        style={{ opacity: bgOpacity, scaleX: progress }}
-      />
+      {!isStarry && (
+        <motion.div 
+          className="absolute inset-0 bg-indigo-600 dark:bg-indigo-500 origin-left"
+          style={{ opacity: bgOpacity, scaleX: progress }}
+        />
+      )}
+      {isStarry && (
+        <motion.div 
+          className="absolute inset-0 bg-indigo-600/50 backdrop-blur-sm origin-left"
+          style={{ opacity: bgOpacity, scaleX: progress, zIndex: 1 }}
+        />
+      )}
       
       {/* Text in the background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className={`font-medium transition-opacity duration-300 ${isSuccess ? 'opacity-0' : 'text-gray-500 dark:text-gray-400'}`}>
-          {loading ? loadingText : text}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 2 }}>
+        <span className={`font-bold tracking-widest transition-opacity duration-300 ${isSuccess ? 'opacity-0' : (isStarry ? 'text-white text-xs text-shadow-sm' : 'text-gray-500 dark:text-gray-400')}`}>
+          {loading ? loadingText.toUpperCase() : text.toUpperCase()}
         </span>
-        <span className={`absolute font-medium text-white transition-opacity duration-300 ${isSuccess && !loading ? 'opacity-100' : 'opacity-0'}`}>
-          Success!
+        <span className={`absolute font-bold tracking-widest text-white transition-opacity duration-300 ${isSuccess && !loading ? 'opacity-100' : 'opacity-0'}`}>
+          SUCCESS!
         </span>
       </div>
 

@@ -124,10 +124,11 @@ export default function LoginPage() {
         {/* Guest Login Option */}
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Not a client or employee?</p>
-          <div className="px-4">
+          <div className="px-4 pb-2">
             <SlideToLogin 
               text="Slide for Guest Access"
               loadingText="Entering Guest Mode..."
+              variant="starry"
               onSuccess={() => {
                 setTimeout(() => {
                   window.location.href = '/home';
