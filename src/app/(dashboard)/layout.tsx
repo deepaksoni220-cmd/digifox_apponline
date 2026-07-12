@@ -1,19 +1,50 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { NAV_ITEMS } from '@/lib/constants';
 import Link from 'next/link';
-import { Sparkles, Bell, Search, Menu, LogOut } from 'lucide-react';
+import { Sparkles, Bell, Search, Menu, LogOut, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+
   const role = pathname.startsWith('/admin') ? 'admin' 
              : pathname.startsWith('/employee') ? 'employee' 
              : pathname.startsWith('/client') ? 'client' 
              : 'guest';
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.replace('/login');
+          return;
+        }
+      } catch {
+        router.replace('/login');
+        return;
+      }
+      setIsChecking(false);
+    };
+    checkAuth();
+  }, [router]);
+
+  if (isChecking) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-dvh bg-gray-50 dark:bg-gray-950">

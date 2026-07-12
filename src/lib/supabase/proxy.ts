@@ -29,27 +29,33 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Define protected routes FIRST before any async calls
   const pathname = request.nextUrl.pathname;
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup');
   const isProtectedRoute = pathname.startsWith('/admin') || pathname.startsWith('/employee') || pathname.startsWith('/client');
 
-  // Only check auth for protected routes to avoid unnecessary calls
   if (isProtectedRoute) {
-    let user = null;
+    // FAST CHECK: Look for any Supabase auth cookies first.
+    // If none exist at all, there's definitely no session — redirect immediately.
+    const allCookies = request.cookies.getAll();
+    const hasAuthCookie = allCookies.some(c => c.name.includes('auth-token') || c.name.includes('sb-'));
     
+    if (!hasAuthCookie) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+
+    // DEEP CHECK: Validate the session with Supabase
+    let user = null;
     try {
       const { data, error } = await supabase.auth.getUser();
       if (!error && data?.user) {
         user = data.user;
       }
     } catch (e) {
-      // If getUser fails for any reason, treat as unauthenticated
       user = null;
     }
 
     if (!user) {
-      // No authenticated user — block access immediately
       const url = request.nextUrl.clone();
       url.pathname = '/login';
       return NextResponse.redirect(url);
