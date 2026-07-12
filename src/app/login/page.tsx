@@ -24,19 +24,20 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('password', password);
 
-      if (error) {
-        throw error;
+      const { loginAction } = await import('@/app/actions/auth');
+      const result = await loginAction(formData);
+
+      if (result?.error) {
+        throw new Error(result.error);
       }
 
-      if (data?.user) {
-        const role = data.user.user_metadata?.role;
-        const loginId = email.toLowerCase();
+      if (result?.success && result.user) {
+        const role = result.user.role;
+        const loginId = result.user.email?.toLowerCase() || '';
         
         if (role === 'admin' || loginId.includes('admin')) {
           router.push('/admin');
