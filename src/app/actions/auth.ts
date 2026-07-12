@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { headers } from 'next/headers';
 
 export async function loginAction(formData: FormData) {
@@ -100,4 +101,42 @@ export async function loginAction(formData: FormData) {
     success: true, 
     user: { email: data.user.email, role } 
   };
+}
+
+export async function createAccount(formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const role = formData.get('role') as string || 'client';
+
+  if (!email || !password) {
+    return { success: false, error: 'Email and password are required' };
+  }
+
+  try {
+    const supabaseAdmin = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    );
+
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { role },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, user: data.user };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'An unexpected error occurred' };
+  }
 }
