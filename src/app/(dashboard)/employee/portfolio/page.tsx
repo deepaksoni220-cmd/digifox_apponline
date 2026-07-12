@@ -1,65 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PORTFOLIO_CATEGORIES } from '@/lib/constants';
-import { ExternalLink, ArrowRight } from 'lucide-react';
+import { ExternalLink, ArrowRight, Loader2 } from 'lucide-react';
+import { getPortfolioItems } from '@/app/actions/portfolio';
 
-// Realistic data based on Digifox.world's capabilities
-const portfolioItems = [
-  {
-    id: 1,
-    title: 'Aura 3D E-Commerce',
-    category: '3D Animated Website',
-    link: 'https://apple.com', // Example URL
-    description: 'A fully interactive 3D WebGL experience built for a premium tech brand.',
-  },
-  {
-    id: 2,
-    title: 'Lumina Fashion',
-    category: 'Shopify Store',
-    link: 'https://gymshark.com',
-    description: 'High-converting Shopify store with custom animations and 200% ROI on Meta Ads.',
-  },
-  {
-    id: 3,
-    title: 'Apex Financial',
-    category: 'WordPress Website',
-    link: 'https://stripe.com',
-    description: 'High-performance WordPress enterprise platform with custom dashboard.',
-  },
-  {
-    id: 4,
-    title: 'Organic Growth Co.',
-    category: 'Google Ranking',
-    link: 'https://vercel.com',
-    description: 'Achieved 450% increase in Google organic traffic within 6 months.',
-  },
-  {
-    id: 5,
-    title: 'Nexus Campaign',
-    category: 'Ad Creative',
-    link: 'https://dribbble.com',
-    description: 'Scroll-stopping ad creatives that generated a 3x ROAS.',
-  },
-  {
-    id: 6,
-    title: 'Verve Branding',
-    category: 'Shopify Store',
-    link: 'https://allbirds.com',
-    description: 'Complete brand identity and Shopify setup.',
-  }
-];
+type PortfolioItem = {
+  id: number;
+  title: string;
+  category: string;
+  link: string;
+  description: string;
+};
 
 export default function PortfolioPage() {
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [items, setItems] = useState<PortfolioItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadItems() {
+      setIsLoading(true);
+      const data = await getPortfolioItems();
+      setItems(data);
+      setIsLoading(false);
+    }
+    loadItems();
+  }, []);
 
   const filteredItems = activeCategory === 'All' 
-    ? portfolioItems 
-    : portfolioItems.filter(item => item.category === activeCategory);
+    ? items 
+    : items.filter(item => item.category === activeCategory);
 
   return (
-    <div className="container mx-auto px-4 py-24 sm:px-6 lg:px-8 min-h-[calc(100dvh-64px)]">
+    <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8 min-h-[calc(100dvh-64px)]">
       <div className="mx-auto max-w-2xl text-center mb-16">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -105,70 +80,80 @@ export default function PortfolioPage() {
         ))}
       </div>
       
-      {/* Portfolio Grid */}
-      <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence mode="popLayout">
-          {filteredItems.map((item) => {
-            const imageUrl = `https://image.thum.io/get/width/800/crop/600/${item.link}`;
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        </div>
+      ) : filteredItems.length === 0 ? (
+        <div className="text-center py-20 text-gray-500 dark:text-gray-400">
+          No projects found in this category.
+        </div>
+      ) : (
+        <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <AnimatePresence mode="popLayout">
+            {filteredItems.map((item) => {
+              const imageUrl = `https://image.thum.io/get/width/800/crop/600/${item.link}`;
 
-            return (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-                className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-sm dark:bg-gray-900 dark:border-gray-800/50 flex flex-col"
-              >
-                <div className="aspect-[4/3] overflow-hidden relative">
-                  <img 
-                    src={imageUrl} 
-                    alt={item.title} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {item.link && (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+              return (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-sm dark:bg-gray-900 dark:border-gray-800/50 flex flex-col"
+                >
+                  <div className="aspect-[4/3] overflow-hidden relative bg-gray-100 dark:bg-gray-800">
+                    <img 
+                      src={imageUrl} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={(e) => e.currentTarget.style.display = 'none'}
+                    />
+                    {item.link && (
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                        <a 
+                          href={item.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="bg-white/90 text-gray-900 px-6 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2 hover:bg-white hover:scale-105 transition-all shadow-lg"
+                        >
+                          Visit Website <ArrowRight className="w-4 h-4" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6 flex-1 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                        {item.category}
+                      </span>
+                      {item.link && <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />}
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-1">
+                      {item.description}
+                    </p>
+                    
+                    {item.link && (
                       <a 
-                        href={item.link} 
+                        href={item.link}
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="bg-white/90 text-gray-900 px-6 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2 hover:bg-white hover:scale-105 transition-all shadow-lg"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 mt-auto w-fit group/btn"
                       >
-                        Visit Website <ArrowRight className="w-4 h-4" />
+                        View Live Site 
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                       </a>
-                    </div>
-                  )}
-                </div>
-                <div className="p-6 flex-1 flex flex-col">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                      {item.category}
-                    </span>
-                    {item.link && <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />}
+                    )}
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-1">
-                    {item.description}
-                  </p>
-                  
-                  {item.link && (
-                    <a 
-                      href={item.link}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 mt-auto w-fit group/btn"
-                    >
-                      View Live Site 
-                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                    </a>
-                  )}
-                </div>
-              </motion.div>
-            )
-          })}
-        </AnimatePresence>
-      </motion.div>
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
+        </motion.div>
+      )}
     </div>
   );
 }

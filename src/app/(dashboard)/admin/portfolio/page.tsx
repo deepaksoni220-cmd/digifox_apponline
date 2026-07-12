@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PORTFOLIO_CATEGORIES } from '@/lib/constants';
-import { ExternalLink, ArrowRight, Plus, Pencil, Trash2, X, Save } from 'lucide-react';
+import { ExternalLink, ArrowRight, Plus, Pencil, Trash2, X, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { getPortfolioItems, addPortfolioItem, updatePortfolioItem, deletePortfolioItem } from '@/app/actions/portfolio';
 
 type PortfolioItem = {
   id: number;
@@ -15,57 +16,24 @@ type PortfolioItem = {
   description: string;
 };
 
-const defaultItems: PortfolioItem[] = [
-  {
-    id: 1,
-    title: 'Aura 3D E-Commerce',
-    category: '3D Animated Website',
-    link: 'https://apple.com',
-    description: 'A fully interactive 3D WebGL experience built for a premium tech brand.',
-  },
-  {
-    id: 2,
-    title: 'Lumina Fashion',
-    category: 'Shopify Store',
-    link: 'https://gymshark.com',
-    description: 'High-converting Shopify store with custom animations and 200% ROI on Meta Ads.',
-  },
-  {
-    id: 3,
-    title: 'Apex Financial',
-    category: 'WordPress Website',
-    link: 'https://stripe.com',
-    description: 'High-performance WordPress enterprise platform with custom dashboard.',
-  },
-  {
-    id: 4,
-    title: 'Organic Growth Co.',
-    category: 'Google Ranking',
-    link: 'https://vercel.com',
-    description: 'Achieved 450% increase in Google organic traffic within 6 months.',
-  },
-  {
-    id: 5,
-    title: 'Nexus Campaign',
-    category: 'Ad Creative',
-    link: 'https://dribbble.com',
-    description: 'Scroll-stopping ad creatives that generated a 3x ROAS.',
-  },
-  {
-    id: 6,
-    title: 'Verve Branding',
-    category: 'Shopify Store',
-    link: 'https://allbirds.com',
-    description: 'Complete brand identity and Shopify setup.',
-  }
-];
-
 export default function AdminPortfolioPage() {
   const [activeCategory, setActiveCategory] = useState<string>('All');
-  const [items, setItems] = useState<PortfolioItem[]>(defaultItems);
+  const [items, setItems] = useState<PortfolioItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ title: '', category: '3D Animated Website', link: '', description: '' });
+
+  useEffect(() => {
+    async function loadItems() {
+      setIsLoading(true);
+      const data = await getPortfolioItems();
+      setItems(data);
+      setIsLoading(false);
+    }
+    loadItems();
+  }, []);
 
   const filteredItems = activeCategory === 'All' 
     ? items 
@@ -83,25 +51,45 @@ export default function AdminPortfolioPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this project?')) return;
+    
+    // Optimistic UI update
     setItems(prev => prev.filter(item => item.id !== id));
+    
+    const { error } = await deletePortfolioItem(id);
+    if (error) {
+      alert(`Failed to delete: ${error}`);
+      // Refresh to restore original state
+      const data = await getPortfolioItems();
+      setItems(data);
+    }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.link) return;
+    setIsSaving(true);
 
     if (editingItem) {
-      setItems(prev => prev.map(item => 
-        item.id === editingItem.id 
-          ? { ...item, ...formData } 
-          : item
-      ));
+      const { data, error } = await updatePortfolioItem(editingItem.id, formData);
+      if (error) {
+        alert(`Failed to update: ${error}`);
+      } else if (data) {
+        setItems(prev => prev.map(item => item.id === editingItem.id ? data : item));
+        setShowForm(false);
+        setEditingItem(null);
+      }
     } else {
-      const newId = Math.max(...items.map(i => i.id), 0) + 1;
-      setItems(prev => [...prev, { id: newId, ...formData }]);
+      const { data, error } = await addPortfolioItem(formData);
+      if (error) {
+        alert(`Failed to add: ${error}`);
+      } else if (data) {
+        setItems(prev => [data, ...prev]);
+        setShowForm(false);
+        setEditingItem(null);
+      }
     }
-    setShowForm(false);
-    setEditingItem(null);
+    setIsSaving(false);
   };
 
   return (
@@ -126,7 +114,7 @@ export default function AdminPortfolioPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-            onClick={() => setShowForm(false)}
+            onClick={() => !isSaving && setShowForm(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -139,7 +127,11 @@ export default function AdminPortfolioPage() {
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   {editingItem ? 'Edit Project' : 'Add New Project'}
                 </h2>
-                <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <button 
+                  onClick={() => setShowForm(false)} 
+                  disabled={isSaving}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 disabled:opacity-50"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -152,6 +144,7 @@ export default function AdminPortfolioPage() {
                     onChange={(e: any) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="My Awesome Project"
                     className="rounded-xl"
+                    disabled={isSaving}
                   />
                 </div>
 
@@ -162,13 +155,15 @@ export default function AdminPortfolioPage() {
                     onChange={(e: any) => setFormData(prev => ({ ...prev, link: e.target.value }))}
                     placeholder="https://example.com"
                     className="rounded-xl"
+                    disabled={isSaving}
                   />
                   {formData.link && (
-                    <div className="mt-3 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 aspect-video">
+                    <div className="mt-3 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                       <img 
                         src={`https://image.thum.io/get/width/600/crop/400/${formData.link}`} 
                         alt="Preview" 
                         className="w-full h-full object-cover"
+                        onError={(e) => e.currentTarget.style.display = 'none'}
                       />
                     </div>
                   )}
@@ -179,6 +174,7 @@ export default function AdminPortfolioPage() {
                   <select 
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                    disabled={isSaving}
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {PORTFOLIO_CATEGORIES.map(cat => (
@@ -194,12 +190,18 @@ export default function AdminPortfolioPage() {
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="Brief description of the project..."
                     rows={3}
+                    disabled={isSaving}
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                   />
                 </div>
 
-                <Button onClick={handleSave} className="w-full mt-2 flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20" disabled={!formData.title || !formData.link}>
-                  <Save className="w-4 h-4" /> {editingItem ? 'Save Changes' : 'Add Project'}
+                <Button 
+                  onClick={handleSave} 
+                  className="w-full mt-2 flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20" 
+                  disabled={!formData.title || !formData.link || isSaving}
+                >
+                  {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  {isSaving ? 'Saving...' : editingItem ? 'Save Changes' : 'Add Project'}
                 </Button>
               </div>
             </motion.div>
@@ -234,86 +236,96 @@ export default function AdminPortfolioPage() {
         ))}
       </div>
       
-      {/* Portfolio Grid */}
-      <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence mode="popLayout">
-          {filteredItems.map((item) => {
-            const imageUrl = `https://image.thum.io/get/width/800/crop/600/${item.link}`;
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        </div>
+      ) : filteredItems.length === 0 ? (
+        <div className="text-center py-20 text-gray-500 dark:text-gray-400">
+          No projects found in this category.
+        </div>
+      ) : (
+        <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <AnimatePresence mode="popLayout">
+            {filteredItems.map((item) => {
+              const imageUrl = `https://image.thum.io/get/width/800/crop/600/${item.link}`;
 
-            return (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-                className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-sm dark:bg-gray-900 dark:border-gray-800/50 flex flex-col"
-              >
-                {/* Admin action buttons */}
-                <div className="absolute top-3 right-3 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
-                    onClick={() => handleEdit(item)}
-                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
-                  >
-                    <Pencil className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(item.id)}
-                    className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </button>
-                </div>
+              return (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-sm dark:bg-gray-900 dark:border-gray-800/50 flex flex-col"
+                >
+                  {/* Admin action buttons */}
+                  <div className="absolute top-3 right-3 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => handleEdit(item)}
+                      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+                    >
+                      <Pencil className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(item.id)}
+                      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </button>
+                  </div>
 
-                <div className="aspect-[4/3] overflow-hidden relative">
-                  <img 
-                    src={imageUrl} 
-                    alt={item.title} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {item.link && (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                  <div className="aspect-[4/3] overflow-hidden relative bg-gray-100 dark:bg-gray-800">
+                    <img 
+                      src={imageUrl} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={(e) => e.currentTarget.style.display = 'none'}
+                    />
+                    {item.link && (
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                        <a 
+                          href={item.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="bg-white/90 text-gray-900 px-6 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2 hover:bg-white hover:scale-105 transition-all shadow-lg"
+                        >
+                          Visit Website <ArrowRight className="w-4 h-4" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6 flex-1 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                        {item.category}
+                      </span>
+                      {item.link && <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />}
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-1">
+                      {item.description}
+                    </p>
+                    
+                    {item.link && (
                       <a 
-                        href={item.link} 
+                        href={item.link}
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="bg-white/90 text-gray-900 px-6 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2 hover:bg-white hover:scale-105 transition-all shadow-lg"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 mt-auto w-fit group/btn"
                       >
-                        Visit Website <ArrowRight className="w-4 h-4" />
+                        View Live Site 
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                       </a>
-                    </div>
-                  )}
-                </div>
-                <div className="p-6 flex-1 flex flex-col">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                      {item.category}
-                    </span>
-                    {item.link && <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />}
+                    )}
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-1">
-                    {item.description}
-                  </p>
-                  
-                  {item.link && (
-                    <a 
-                      href={item.link}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 mt-auto w-fit group/btn"
-                    >
-                      View Live Site 
-                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                    </a>
-                  )}
-                </div>
-              </motion.div>
-            )
-          })}
-        </AnimatePresence>
-      </motion.div>
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
+        </motion.div>
+      )}
     </div>
   );
 }
