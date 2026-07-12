@@ -32,14 +32,14 @@ const portfolioItems = [
     id: 4,
     title: 'Organic Growth Co.',
     category: 'Google Ranking',
-    image: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?q=80&w=800&auto=format&fit=crop',
+    link: 'https://vercel.com',
     description: 'Achieved 450% increase in Google organic traffic within 6 months.',
   },
   {
     id: 5,
     title: 'Nexus Campaign',
     category: 'Ad Creative',
-    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=800&auto=format&fit=crop',
+    link: 'https://dribbble.com',
     description: 'Scroll-stopping ad creatives that generated a 3x ROAS.',
   },
   {
