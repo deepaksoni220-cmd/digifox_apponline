@@ -11,21 +11,21 @@ const portfolioItems = [
     id: 1,
     title: 'Aura 3D E-Commerce',
     category: '3D Animated Website',
-    image: 'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=800&auto=format&fit=crop',
+    link: 'https://apple.com', // Example URL
     description: 'A fully interactive 3D WebGL experience built for a premium tech brand.',
   },
   {
     id: 2,
     title: 'Lumina Fashion',
     category: 'Shopify Store',
-    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop',
+    link: 'https://gymshark.com',
     description: 'High-converting Shopify store with custom animations and 200% ROI on Meta Ads.',
   },
   {
     id: 3,
     title: 'Apex Financial',
     category: 'WordPress Website',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop',
+    link: 'https://stripe.com',
     description: 'High-performance WordPress enterprise platform with custom dashboard.',
   },
   {
@@ -46,7 +46,7 @@ const portfolioItems = [
     id: 6,
     title: 'Verve Branding',
     category: 'Shopify Store',
-    image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=800&auto=format&fit=crop',
+    link: 'https://allbirds.com',
     description: 'Complete brand identity and Shopify setup.',
   }
 ];
@@ -108,37 +108,67 @@ export default function PortfolioPage() {
       {/* Portfolio Grid */}
       <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
-          {filteredItems.map((item) => (
-            <motion.div
-              key={item.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-              className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-sm dark:bg-gray-900 dark:border-gray-800/50"
-            >
-              <div className="aspect-[4/3] overflow-hidden">
-                <img 
-                  src={item.image} 
-                  alt={item.title} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    {item.category}
-                  </span>
-                  <ExternalLink className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+          {filteredItems.map((item) => {
+            const imageUrl = item.link 
+              ? `https://image.thum.io/get/width/800/crop/600/${item.link}` 
+              : item.image;
+
+            return (
+              <motion.div
+                key={item.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+                className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-sm dark:bg-gray-900 dark:border-gray-800/50 flex flex-col"
+              >
+                <div className="aspect-[4/3] overflow-hidden relative">
+                  <img 
+                    src={imageUrl} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {item.link && (
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                      <a 
+                        href={item.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-white/90 text-gray-900 px-6 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2 hover:bg-white hover:scale-105 transition-all shadow-lg"
+                      >
+                        Visit Website <ArrowRight className="w-4 h-4" />
+                      </a>
+                    </div>
+                  )}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
-                  {item.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+                <div className="p-6 flex-1 flex flex-col">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                      {item.category}
+                    </span>
+                    {item.link && <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4 flex-1">
+                    {item.description}
+                  </p>
+                  
+                  {item.link && (
+                    <a 
+                      href={item.link}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 mt-auto w-fit group/btn"
+                    >
+                      View Live Site 
+                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            )
+          })}
         </AnimatePresence>
       </motion.div>
     </div>
