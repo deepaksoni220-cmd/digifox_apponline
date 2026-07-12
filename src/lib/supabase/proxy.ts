@@ -34,29 +34,38 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Define protected routes
-  const protectedPaths = ['/admin', '/employee', '/client'];
-  const isProtectedRoute = protectedPaths.some(path =>
-    request.nextUrl.pathname.startsWith(path)
-  );
-
-  /*
-  if (isProtectedRoute && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/';
-    url.searchParams.set('redirect', request.nextUrl.pathname);
-    return NextResponse.redirect(url);
+  const pathname = request.nextUrl.pathname;
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup');
+  const isProtectedRoute = pathname.startsWith('/admin') || pathname.startsWith('/employee') || pathname.startsWith('/client');
+  
+  if (!user && !isAuthRoute && isProtectedRoute) {
+    // no user, redirect to login
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
-  // If user is logged in and visits login page, redirect to their dashboard
-  if (user && request.nextUrl.pathname === '/') {
-    // Get user role from metadata or profile
-    const role = (user.user_metadata?.role as string) || 'client';
-    const dashboardPath = role === 'admin' ? '/admin' : role === 'employee' ? '/employee' : '/client';
-    const url = request.nextUrl.clone();
-    url.pathname = dashboardPath;
-    return NextResponse.redirect(url);
+  // If user is logged in, restrict access based on basic email matching rules from the prototype
+  if (user && !isAuthRoute) {
+    const email = user.email?.toLowerCase() || '';
+    const role = user.user_metadata?.role;
+    
+    const isAdmin = role === 'admin' || email.includes('admin');
+    const isEmployee = role === 'employee' || email.includes('employee') || email.includes('emp_');
+    const isClient = !isAdmin && !isEmployee;
+
+    if (pathname.startsWith('/admin') && !isAdmin) {
+      const url = request.nextUrl.clone()
+      url.pathname = isEmployee ? '/employee' : '/client'
+      return NextResponse.redirect(url)
+    }
+
+    if (pathname.startsWith('/employee') && !isEmployee) {
+      const url = request.nextUrl.clone()
+      url.pathname = isAdmin ? '/admin' : '/client'
+      return NextResponse.redirect(url)
+    }
   }
-  */
 
   return supabaseResponse;
 }
