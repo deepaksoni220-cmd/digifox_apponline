@@ -109,9 +109,7 @@ export default function PortfolioPage() {
       <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
           {filteredItems.map((item) => {
-            const imageUrl = item.link 
-              ? `https://image.thum.io/get/width/800/crop/600/${item.link}` 
-              : item.image;
+            const imageUrl = `https://image.thum.io/get/width/800/crop/600/${item.link}`;
 
             return (
               <motion.div
