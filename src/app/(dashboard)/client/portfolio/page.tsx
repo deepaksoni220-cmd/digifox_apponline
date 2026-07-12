@@ -102,7 +102,7 @@ export default function PortfolioPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-sm dark:bg-gray-900 dark:border-gray-800/50 flex flex-col"
+                  className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-sm hover:border-indigo-500/50 hover:shadow-[0_0_30px_-5px_rgba(99,102,241,0.4)] transition-all duration-300 dark:bg-gray-900 dark:border-gray-800/50 dark:hover:border-indigo-400/50 dark:hover:shadow-[0_0_30px_-5px_rgba(129,140,248,0.3)] flex flex-col"
                 >
                   <div className="aspect-[4/3] overflow-hidden relative bg-gray-100 dark:bg-gray-800">
                     <img 
