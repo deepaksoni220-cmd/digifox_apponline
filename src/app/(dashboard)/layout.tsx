@@ -29,6 +29,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           router.replace('/login');
           return;
         }
+
+        // Role-based access control
+        const email = user.email?.toLowerCase() || '';
+        const userRole = user.user_metadata?.role;
+        
+        const isAdmin = userRole === 'admin' || email.includes('admin');
+        const isEmployee = userRole === 'employee' || email.includes('employee') || email.includes('emp_');
+
+        // Redirect if user doesn't belong to this dashboard
+        if (role === 'admin' && !isAdmin) {
+          router.replace(isEmployee ? '/employee' : '/client');
+          return;
+        }
+        if (role === 'employee' && !isEmployee) {
+          router.replace(isAdmin ? '/admin' : '/client');
+          return;
+        }
+        if (role === 'client' && (isAdmin || isEmployee)) {
+          router.replace(isAdmin ? '/admin' : '/employee');
+          return;
+        }
       } catch {
         router.replace('/login');
         return;
@@ -36,7 +57,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       setIsChecking(false);
     };
     checkAuth();
-  }, [router]);
+  }, [router, role]);
 
   if (isChecking) {
     return (
