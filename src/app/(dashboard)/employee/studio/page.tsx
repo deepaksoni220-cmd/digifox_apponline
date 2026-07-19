@@ -81,10 +81,10 @@ const ProjectTimeline = () => {
 
       <div className="relative w-full pb-8">
         {/* Horizontal scroll container */}
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-8 pb-12 pt-12 px-8 sm:px-12 md:px-24 [&::-webkit-scrollbar]:hidden relative items-start">
+        <div className="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory gap-6 lg:gap-8 pb-12 pt-12 px-4 sm:px-12 md:px-0 [&::-webkit-scrollbar]:hidden relative items-start w-full">
           
           {/* Continuous Horizontal Line (Behind nodes) */}
-          <div className="absolute top-[80px] left-8 right-8 h-1 bg-gray-200 dark:bg-gray-800 -translate-y-1/2 z-0 hidden md:block rounded-full">
+          <div className="absolute top-[80px] left-12 right-12 lg:left-16 lg:right-16 h-1 bg-gray-200 dark:bg-gray-800 -translate-y-1/2 z-0 hidden md:block rounded-full">
             <div className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 w-[40%] rounded-full"></div>
           </div>
 
@@ -101,7 +101,7 @@ const ProjectTimeline = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: i * 0.1 }}
-                className="relative snap-center shrink-0 w-[280px] sm:w-80 flex flex-col items-center justify-start z-10 group"
+                className="relative snap-center shrink-0 w-[280px] sm:w-80 md:w-auto flex flex-col items-center justify-start z-10 group"
               >
                 
                 {/* Arrow to Next Step */}
