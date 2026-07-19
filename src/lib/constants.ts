@@ -69,6 +69,7 @@ export const NAV_ITEMS = {
     { label: 'Home', href: '/home', icon: 'Home' },
     { label: 'Portfolio', href: '/portfolio', icon: 'Briefcase' },
     { label: 'Studio', href: '/studio', icon: 'Palette' },
+    { label: 'Pricing', href: '/pricing', icon: 'Tag' },
     { label: 'Contact', href: '/contact', icon: 'Mail' },
   ],
 } as const;
