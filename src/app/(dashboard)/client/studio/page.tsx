@@ -66,7 +66,7 @@ const PROJECT_STEPS = [
 
 const ProjectTimeline = () => {
   return (
-    <div className="mt-40 mb-20 w-full max-w-7xl mx-auto z-10 relative overflow-hidden">
+    <div className="mt-40 mb-20 w-full max-w-none z-10 relative overflow-hidden px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-16">
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
@@ -81,7 +81,7 @@ const ProjectTimeline = () => {
 
       <div className="relative w-full pb-8">
         {/* Horizontal scroll container */}
-        <div className="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory gap-6 lg:gap-8 pb-12 pt-12 px-4 sm:px-12 md:px-0 [&::-webkit-scrollbar]:hidden relative items-start w-full">
+        <div className="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory gap-4 lg:gap-8 pb-12 pt-12 px-4 sm:px-8 md:px-8 lg:px-12 [&::-webkit-scrollbar]:hidden relative items-start w-full">
           
           {/* Continuous Horizontal Line (Behind nodes) */}
           <div className="absolute top-[80px] left-12 right-12 lg:left-16 lg:right-16 h-1 bg-gray-200 dark:bg-gray-800 -translate-y-1/2 z-0 hidden md:block rounded-full">
@@ -201,10 +201,10 @@ export default function StudioPage() {
             />
           ))}
         </div>
-
-        {/* Project Progress Section */}
-        <ProjectTimeline />
       </div>
+
+      {/* Project Progress Section */}
+      <ProjectTimeline />
     </div>
   );
 }
