@@ -4,7 +4,6 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { SERVICES } from '@/lib/constants';
 import * as Icons from 'lucide-react';
-import PulsingBorder from '@/components/ui/pulsing-border';
 
 const ServiceCard = ({ 
   service, 
@@ -28,18 +27,8 @@ const ServiceCard = ({
       <motion.div
         className="relative p-12 rounded-3xl shadow-2xl hover:-translate-y-2 transition-transform duration-300 group w-full max-w-4xl min-h-[400px] flex flex-col justify-center"
       >
-        <div className="absolute inset-0 -z-10 transition-opacity duration-500 flex items-stretch justify-stretch">
-          <PulsingBorder 
-            colorBack="#0f172a" 
-            colors={["#af40ff", "#5b42f3", "#00ddeb"]}
-            roundness={0.2}
-            thickness={0.005}
-            speed={0.5}
-            aspectRatio="auto"
-            scale={1}
-            style={{ width: "100%", height: "100%", flex: 1, borderRadius: "1.5rem" }} 
-          />
-        </div>
+        <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 opacity-50 group-hover:opacity-100 transition-opacity duration-500 blur-[2px]"></div>
+        <div className="absolute inset-0 -z-10 rounded-3xl bg-gray-900/90 backdrop-blur-xl border border-white/10"></div>
         
         <div className="relative z-10 flex flex-col items-center text-center mt-4">
           <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-md text-white mb-8 group-hover:scale-110 transition-transform duration-300 border border-white/20 shadow-lg">
